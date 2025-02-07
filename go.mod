@@ -1,4 +1,4 @@
-module github.com/AyKrimino/JowseekerAPI
+module github.com/AyKrimino/JobSeekerAPI
 
 go 1.23.5
 

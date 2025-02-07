@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/AyKrimino/JowseekerAPI/cmd/api"
-	"github.com/AyKrimino/JowseekerAPI/config"
-	"github.com/AyKrimino/JowseekerAPI/db"
+	"github.com/AyKrimino/JobSeekerAPI/cmd/api"
+	"github.com/AyKrimino/JobSeekerAPI/config"
+	"github.com/AyKrimino/JobSeekerAPI/db"
 	"github.com/go-sql-driver/mysql"
 )
 
