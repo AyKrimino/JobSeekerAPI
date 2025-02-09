@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS Company (
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    headquarters VARCHAR(255),
+    website VARCHAR(255),
+    industry VARCHAR(255),
+    companySize VARCHAR(50),
+    userId INT UNSIGNED,
+    FOREIGN KEY (userID) REFERENCES User(id) ON DELETE CASCADE
+)
