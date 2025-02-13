@@ -60,5 +60,5 @@ type RegisterUserRequest struct {
 	Headquarters string `json:"headquarters,omitempty"`
 	Website      string `json:"website,omitempty"`
 	Industry     string `json:"industry,omitempty"`
-	CompanySize  string `json:"companySize,omitempty" validate:"max=50"`
+	CompanySize  string `json:"companySize,omitempty"`
 }
