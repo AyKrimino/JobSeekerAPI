@@ -43,22 +43,22 @@ type UserStore interface {
 }
 
 type RegisterUserRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Role     string `json:"role"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=6,max=200"`
+	Role     string `json:"role" validate:"required,oneofci=JobSeeker Company"`
 
 	// JobSeeker-specific fields
-	FirstName      string   `json:"firstName,omitempty"`
-	LastName       string   `json:"lastName,omitempty"`
-	ProfileSummary string   `json:"profileSummary,omitempty"`
+	FirstName      string   `json:"firstName,omitempty" validate:"alpha"`
+	LastName       string   `json:"lastName,omitempty" validate:"alpha"`
+	ProfileSummary string   `json:"profileSummary,omitempty" validate:"max=500"`
 	Skills         []string `json:"skills,omitempty"`
-	Experience     int      `json:"experience,omitempty"`
-	Education      string   `json:"education,omitempty"`
+	Experience     int      `json:"experience,omitempty" validate:"gte=0,lte=50"`
+	Education      string   `json:"education,omitempty" validate:"max=255"`
 
 	// Company-specific fields
-	Name         string `json:"name,omitempty"`
-	Headquarters string `json:"headquarters,omitempty"`
-	Website      string `json:"website,omitempty"`
-	Industry     string `json:"industry,omitempty"`
-	CompanySize  string `json:"companySize,omitempty"`
+	Name         string `json:"name,omitempty" validate:"alpha,max=255"`
+	Headquarters string `json:"headquarters,omitempty" validate:"max=255"`
+	Website      string `json:"website,omitempty" validate:"max=255,url"`
+	Industry     string `json:"industry,omitempty" validate:"max=255"`
+	CompanySize  string `json:"companySize,omitempty" validate:"max=50"`
 }

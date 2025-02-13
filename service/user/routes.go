@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"github.com/go-playground/validator/v10"
 
 	"github.com/AyKrimino/JobSeekerAPI/types"
 	"github.com/AyKrimino/JobSeekerAPI/utils"
@@ -34,6 +35,11 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// data validation
+	if err := utils.Validate.Struct(req); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid request %v", errors))
+		return
+	}
 
 	// check if email already exists
 	_, err := h.store.GetUserByEmail(req.Email)
