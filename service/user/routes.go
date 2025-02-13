@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
+
 	"github.com/go-playground/validator/v10"
 
+	"github.com/AyKrimino/JobSeekerAPI/service/auth"
 	"github.com/AyKrimino/JobSeekerAPI/types"
 	"github.com/AyKrimino/JobSeekerAPI/utils"
 	"github.com/gorilla/mux"
@@ -28,29 +31,32 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	var req types.RegisterUserRequest
 
-	// parse json data into req
 	if err := utils.ParseJSON(r, &req); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	// data validation
 	if err := utils.Validate.Struct(req); err != nil {
 		errors := err.(validator.ValidationErrors)
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid request %v", errors))
 		return
 	}
 
-	// check if email already exists
 	_, err := h.store.GetUserByEmail(req.Email)
 	if err == nil {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with email %s already exists", req.Email))
 		return
 	}
 
-	// create jobseeker or company
-	switch req.Role {
-	case "JobSeeker":
+	hashedPassword, err := auth.HashPassword(req.Password)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+	req.Password = hashedPassword
+
+	switch strings.ToLower(req.Role) {
+	case "jobseeker":
 		userID, err := h.store.CreateUser(parseUserFromRequest(&req))
 		if err != nil {
 			utils.WriteError(w, http.StatusInternalServerError, err)
@@ -60,7 +66,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 			utils.WriteError(w, http.StatusInternalServerError, err)
 			return
 		}
-	case "Company":
+	case "company":
 		userID, err := h.store.CreateUser(parseUserFromRequest(&req))
 		if err != nil {
 			utils.WriteError(w, http.StatusInternalServerError, err)

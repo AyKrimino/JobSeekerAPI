@@ -48,17 +48,17 @@ type RegisterUserRequest struct {
 	Role     string `json:"role" validate:"required,oneofci=JobSeeker Company"`
 
 	// JobSeeker-specific fields
-	FirstName      string   `json:"firstName,omitempty" validate:"alpha"`
-	LastName       string   `json:"lastName,omitempty" validate:"alpha"`
-	ProfileSummary string   `json:"profileSummary,omitempty" validate:"max=500"`
+	FirstName      string   `json:"firstName,omitempty"`
+	LastName       string   `json:"lastName,omitempty"`
+	ProfileSummary string   `json:"profileSummary,omitempty"`
 	Skills         []string `json:"skills,omitempty"`
-	Experience     int      `json:"experience,omitempty" validate:"gte=0,lte=50"`
-	Education      string   `json:"education,omitempty" validate:"max=255"`
+	Experience     int      `json:"experience,omitempty"`
+	Education      string   `json:"education,omitempty"`
 
 	// Company-specific fields
-	Name         string `json:"name,omitempty" validate:"alpha,max=255"`
-	Headquarters string `json:"headquarters,omitempty" validate:"max=255"`
-	Website      string `json:"website,omitempty" validate:"max=255,url"`
-	Industry     string `json:"industry,omitempty" validate:"max=255"`
+	Name         string `json:"name,omitempty"`
+	Headquarters string `json:"headquarters,omitempty"`
+	Website      string `json:"website,omitempty"`
+	Industry     string `json:"industry,omitempty"`
 	CompanySize  string `json:"companySize,omitempty" validate:"max=50"`
 }
