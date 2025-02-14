@@ -7,6 +7,9 @@ test:
 run: build
 	@./bin/JobSeekerAPI
 
+dev:
+	@air
+
 migrations:
 	@migrate create -ext sql -dir cmd/migrate/migrations $(filter-out $@,$(MAKECMDGOALS))
 

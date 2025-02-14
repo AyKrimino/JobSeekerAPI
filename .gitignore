@@ -26,3 +26,7 @@ go.work.sum
 
 # Ignore compiled binaries
 bin/
+
+# air
+.air.toml
+tmp/
