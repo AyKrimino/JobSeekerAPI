@@ -33,13 +33,19 @@ type Company struct {
 	UserID       int    `json:"userId"`
 }
 
-type UserStore interface {
-	GetUserByEmail(email string) (*User, error)
-	GetUserById(id int) (*User, error)
-	CreateUser(u *User) (id int, err error)
+type UserRepository interface {
+	GetUserByEmail(e string) (*User, error)
+	GetUserByID(id int) (*User, error)
+	CreateUser(u *User) (int, error)
+	GetUserRoleByID(id int) (string, error)
+}
+
+type JobSeekerRepository interface {
 	CreateJobSeeker(js *JobSeeker) error
+}
+
+type CompanyRepository interface {
 	CreateCompany(cpy *Company) error
-	GetUserRoleById(id int) (string, error)
 }
 
 type RegisterUserRequest struct {
