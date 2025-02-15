@@ -36,6 +36,17 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/login", h.handleLogin).Methods("POST")
 }
 
+// @Summary Register a new user
+// @Description Register a new user with jobseeker or company details.
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param register body types.RegisterUserRequest true "Register User Request. Example (JobSeeker): {\"email\": \"JobSeeker@jobseeker.com\", \"password\": \"abcd1234\", \"role\": \"JobSeeker\", \"firstName\": \"job\", \"lastName\": \"seeker\", \"profileSummary\": \"ps\", \"skills\": [\"css\", \"html\", \"python\"], \"experience\": 0, \"education\": \"edu\"}  Example (Company): {\"email\": \"company@company.com\", \"password\": \"dcba4321\", \"role\": \"Company\", \"name\": \"company\", \"headquarters\": \"hq\", \"website\": \"company.com\", \"companySize\": \"big\", \"industry\": \"indu\"}"
+// @Param register body types.RegisterUserRequest true "Register User Request"
+// @Success 201 {object} types.SuccessResponse "User registered successfully"
+// @Failure 400 {object} map[string]string "Bad Request"
+// @Failure 500 {object} map[string]string "Internal Server Error"
+// @Router /api/v1/register [post]
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	var req types.RegisterUserRequest
 
@@ -88,7 +99,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid role"))
 		return
 	}
-	utils.WriteJSON(w, http.StatusCreated, nil)
+	utils.WriteJSON(w, http.StatusCreated, types.SuccessResponse{Message: "User registered successfully"})
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {

@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	httpSwagger "github.com/swaggo/http-swagger"
+	_ "github.com/AyKrimino/JobSeekerAPI/docs"
 	"github.com/AyKrimino/JobSeekerAPI/service/user"
 	"github.com/gorilla/mux"
 )
@@ -27,6 +29,9 @@ func (s *APIServer) Run() error {
 
 	userHandler := user.NewHandler(s.db)
 	userHandler.RegisterRoutes(subrouter)
+
+	// Swagger docs
+	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	log.Println("Listening on: ", s.addr)
 

@@ -2,6 +2,10 @@ package types
 
 import "time"
 
+type SuccessResponse struct {
+    Message string `json:"message"`
+}
+
 type User struct {
 	ID        int       `json:"id"`
 	Email     string    `json:"email"`

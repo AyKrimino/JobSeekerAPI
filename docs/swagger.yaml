@@ -1,0 +1,96 @@
+basePath: /
+definitions:
+  types.RegisterUserRequest:
+    properties:
+      companySize:
+        type: string
+      education:
+        type: string
+      email:
+        type: string
+      experience:
+        type: integer
+      firstName:
+        description: JobSeeker-specific fields
+        type: string
+      headquarters:
+        type: string
+      industry:
+        type: string
+      lastName:
+        type: string
+      name:
+        description: Company-specific fields
+        type: string
+      password:
+        maxLength: 200
+        minLength: 6
+        type: string
+      profileSummary:
+        type: string
+      role:
+        type: string
+      skills:
+        items:
+          type: string
+        type: array
+      website:
+        type: string
+    required:
+    - email
+    - password
+    - role
+    type: object
+  types.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for managing JobSeeker and Company user registrations.
+  title: JobSeeker API
+  version: "1.0"
+paths:
+  /api/v1/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with jobseeker or company details.
+      parameters:
+      - description: 'Register User Request. Example (JobSeeker): {\'
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/types.RegisterUserRequest'
+      - description: Register User Request
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/types.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/types.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - auth
+swagger: "2.0"

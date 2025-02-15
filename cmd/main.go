@@ -11,6 +11,11 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
+// @title JobSeeker API
+// @version 1.0
+// @description API for managing JobSeeker and Company user registrations.
+// @host localhost:8080
+// @BasePath /
 func main() {
 	cfg := mysql.Config{
 		User:                 config.Envs.DBUser,
