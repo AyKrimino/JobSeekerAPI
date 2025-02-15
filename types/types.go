@@ -33,20 +33,28 @@ type Company struct {
 	UserID       int    `json:"userId"`
 }
 
-type UserStore interface {
-	GetUserByEmail(email string) (*User, error)
-	GetUserById(id int) (*User, error)
-	CreateUser(u *User) (id int, err error)
-	CreateJobSeeker(js *JobSeeker) error
-	CreateCompany(cpy *Company) error
-	GetUserRoleById(id int) (string, error)
+type UserRepository interface {
+	GetUserByEmail(e string) (*User, error)
+	GetUserByID(id int) (*User, error)
+	CreateUser(u *User) (int, error)
+	GetUserRoleByID(id int) (string, error)
 }
 
-type RegisterUserRequest struct {
+type JobSeekerRepository interface {
+	CreateJobSeeker(js *JobSeeker) error
+}
+
+type CompanyRepository interface {
+	CreateCompany(cpy *Company) error
+}
+
+type UserRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=6,max=200"`
 	Role     string `json:"role" validate:"required,oneofci=JobSeeker Company"`
+}
 
+type JobSeekerRequest struct {
 	// JobSeeker-specific fields
 	FirstName      string   `json:"firstName,omitempty"`
 	LastName       string   `json:"lastName,omitempty"`
@@ -54,11 +62,19 @@ type RegisterUserRequest struct {
 	Skills         []string `json:"skills,omitempty"`
 	Experience     int      `json:"experience,omitempty"`
 	Education      string   `json:"education,omitempty"`
+}
 
+type CompanyRequest struct {
 	// Company-specific fields
 	Name         string `json:"name,omitempty"`
 	Headquarters string `json:"headquarters,omitempty"`
 	Website      string `json:"website,omitempty"`
 	Industry     string `json:"industry,omitempty"`
 	CompanySize  string `json:"companySize,omitempty"`
+}
+
+type RegisterUserRequest struct {
+	UserRequest
+	JobSeekerRequest
+	CompanyRequest
 }

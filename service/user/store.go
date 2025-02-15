@@ -3,23 +3,23 @@ package user
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/AyKrimino/JobSeekerAPI/types"
-	"github.com/AyKrimino/JobSeekerAPI/utils"
 )
 
-type Store struct {
+type userStore struct {
 	db *sql.DB
 }
 
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewUserStore(db *sql.DB) types.UserRepository {
+	return &userStore{
 		db: db,
 	}
 }
 
-func (s *Store) GetUserByEmail(email string) (*types.User, error) {
-	rows, err := s.db.Query("SELECT * FROM User WHERE email = ?", email)
+func (s *userStore) GetUserByEmail(e string) (*types.User, error) {
+	rows, err := s.db.Query("SELECT * FROM User WHERE email = ?", e)
 	if err != nil {
 		return nil, err
 	}
@@ -39,19 +39,21 @@ func (s *Store) GetUserByEmail(email string) (*types.User, error) {
 	return u, nil
 }
 
-func (s *Store) GetUserById(id int) (*types.User, error) {
+func (s *userStore) GetUserByID(id int) (*types.User, error) {
 	return nil, nil
 }
 
-func (s *Store) CreateUser(u *types.User) (int, error) {
+func (s *userStore) CreateUser(u *types.User) (int, error) {
+	now := time.Now().UTC()
+
 	res, err := s.db.Exec(
 		"INSERT INTO User (email, password, role, isActive, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)",
 		u.Email,
 		u.Password,
 		u.Role,
-		u.IsActive,
-		u.CreatedAt,
-		u.UpdatedAt,
+		true,
+		now,
+		now,
 	)
 
 	if err != nil {
@@ -66,41 +68,7 @@ func (s *Store) CreateUser(u *types.User) (int, error) {
 	return int(id), nil
 }
 
-func (s *Store) CreateJobSeeker(js *types.JobSeeker) error {
-	skillsJSON, err := utils.EncodeStringSliceToJSON(js.Skills)
-	if err != nil {
-		return fmt.Errorf("Error encoding skills to JSON: %v", err)
-	}
-
-	_, err = s.db.Exec(
-		"INSERT INTO JobSeeker (firstName, lastName, profileSummary, skills, experience, education, userID) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		js.FirstName,
-		js.LastName,
-		js.ProfileSummary,
-		skillsJSON,
-		js.Experience,
-		js.Education,
-		js.UserID,
-	)
-
-	return err
-}
-
-func (s *Store) CreateCompany(cpy *types.Company) error {
-	_, err := s.db.Exec(
-		"INSERT INTO Company (name, headquarters, website, industry, companySize, userID) VALUES (?, ?, ?, ?, ?, ?)",
-		cpy.Name,
-		cpy.Headquarters,
-		cpy.Website,
-		cpy.Industry,
-		cpy.CompanySize,
-		cpy.UserID,
-	)
-
-	return err
-}
-
-func (s *Store) GetUserRoleById(id int) (string, error) {
+func (s *userStore) GetUserRoleByID(id int) (string, error) {
 	return "", nil
 }
 
