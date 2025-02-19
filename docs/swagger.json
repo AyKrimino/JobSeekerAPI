@@ -1,14 +1,64 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API for managing JobSeeker and Company user registrations.",
-        "title": "JobSeeker API",
-        "contact": {},
-        "version": "1.0"
+        "contact": {}
     },
-    "host": "localhost:8080",
-    "basePath": "/",
     "paths": {
+        "/api/v1/login": {
+            "post": {
+                "description": "Authenticate a user using email and password, returning a JWT token upon successful login.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "User Login",
+                "parameters": [
+                    {
+                        "description": "User login credentials",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.LoginUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful login, returns JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid request or incorrect credentials",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/register": {
             "post": {
                 "description": "Register a new user with jobseeker or company details.",
@@ -72,6 +122,21 @@
         }
     },
     "definitions": {
+        "types.LoginUserRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "types.RegisterUserRequest": {
             "type": "object",
             "required": [

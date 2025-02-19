@@ -40,7 +40,7 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 // @Description Register a new user with jobseeker or company details.
 // @Tags auth
 // @Accept json
-// @Produce jsoeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30n
+// @Produce json
 // @Param register body types.RegisterUserRequest true "Register User Request. Example (JobSeeker): {\"email\": \"JobSeeker@jobseeker.com\", \"password\": \"abcd1234\", \"role\": \"JobSeeker\", \"firstName\": \"job\", \"lastName\": \"seeker\", \"profileSummary\": \"ps\", \"skills\": [\"css\", \"html\", \"python\"], \"experience\": 0, \"education\": \"edu\"}  Example (Company): {\"email\": \"company@company.com\", \"password\": \"dcba4321\", \"role\": \"Company\", \"name\": \"company\", \"headquarters\": \"hq\", \"website\": \"company.com\", \"companySize\": \"big\", \"industry\": \"indu\"}"
 // @Param register body types.RegisterUserRequest true "Register User Request"
 // @Success 201 {object} types.SuccessResponse "User registered successfully"
@@ -110,6 +110,16 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	)
 }
 
+// @Summary User Login
+// @Description Authenticate a user using email and password, returning a JWT token upon successful login.
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param login body types.LoginUserRequest true "User login credentials"
+// @Success 200 {object} map[string]string "Successful login, returns JWT token"
+// @Failure 400 {object} map[string]string "Bad Request - Invalid request or incorrect credentials"
+// @Failure 500 {object} map[string]string "Internal Server Error"
+// @Router /api/v1/login [post]
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	var req types.LoginUserRequest
 	if err := utils.ParseJSON(r, &req); err != nil {

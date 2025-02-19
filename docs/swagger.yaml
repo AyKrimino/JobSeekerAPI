@@ -1,5 +1,14 @@
-basePath: /
 definitions:
+  types.LoginUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
   types.RegisterUserRequest:
     properties:
       companySize:
@@ -46,13 +55,46 @@ definitions:
       message:
         type: string
     type: object
-host: localhost:8080
 info:
   contact: {}
-  description: API for managing JobSeeker and Company user registrations.
-  title: JobSeeker API
-  version: "1.0"
 paths:
+  /api/v1/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user using email and password, returning a JWT token
+        upon successful login.
+      parameters:
+      - description: User login credentials
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/types.LoginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful login, returns JWT token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request - Invalid request or incorrect credentials
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: User Login
+      tags:
+      - auth
   /api/v1/register:
     post:
       consumes:
