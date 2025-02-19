@@ -5,10 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	httpSwagger "github.com/swaggo/http-swagger"
 	_ "github.com/AyKrimino/JobSeekerAPI/docs"
 	"github.com/AyKrimino/JobSeekerAPI/service/user"
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type APIServer struct {

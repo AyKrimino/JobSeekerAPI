@@ -3,7 +3,7 @@ package types
 import "time"
 
 type SuccessResponse struct {
-    Message string `json:"message"`
+	Message string `json:"message"`
 }
 
 type User struct {
@@ -53,9 +53,9 @@ type CompanyRepository interface {
 }
 
 type UserRequest struct {
-	Email    string `json:"email" validate:"required,email"`
+	Email    string `json:"email"    validate:"required,email"`
 	Password string `json:"password" validate:"required,min=6,max=200"`
-	Role     string `json:"role" validate:"required,oneofci=JobSeeker Company"`
+	Role     string `json:"role"     validate:"required,oneofci=JobSeeker Company"`
 }
 
 type JobSeekerRequest struct {
@@ -81,4 +81,9 @@ type RegisterUserRequest struct {
 	UserRequest
 	JobSeekerRequest
 	CompanyRequest
+}
+
+type LoginUserRequest struct {
+	Email string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
 }

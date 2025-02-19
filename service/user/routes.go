@@ -2,13 +2,13 @@ package user
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
 
+	"github.com/AyKrimino/JobSeekerAPI/config"
 	"github.com/AyKrimino/JobSeekerAPI/service/auth"
 	"github.com/AyKrimino/JobSeekerAPI/service/company"
 	"github.com/AyKrimino/JobSeekerAPI/service/jobseeker"
@@ -18,16 +18,16 @@ import (
 )
 
 type Handler struct {
-	UserRepo types.UserRepository
+	UserRepo      types.UserRepository
 	JobSeekerRepo types.JobSeekerRepository
-	CompanyRepo types.CompanyRepository
+	CompanyRepo   types.CompanyRepository
 }
 
 func NewHandler(db *sql.DB) *Handler {
 	return &Handler{
-		UserRepo: NewUserStore(db),
+		UserRepo:      NewUserStore(db),
 		JobSeekerRepo: jobseeker.NewJobseekerStore(db),
-		CompanyRepo: company.NewCompany(db),
+		CompanyRepo:   company.NewCompany(db),
 	}
 }
 
@@ -40,7 +40,7 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 // @Description Register a new user with jobseeker or company details.
 // @Tags auth
 // @Accept json
-// @Produce json
+// @Produce jsoeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30n
 // @Param register body types.RegisterUserRequest true "Register User Request. Example (JobSeeker): {\"email\": \"JobSeeker@jobseeker.com\", \"password\": \"abcd1234\", \"role\": \"JobSeeker\", \"firstName\": \"job\", \"lastName\": \"seeker\", \"profileSummary\": \"ps\", \"skills\": [\"css\", \"html\", \"python\"], \"experience\": 0, \"education\": \"edu\"}  Example (Company): {\"email\": \"company@company.com\", \"password\": \"dcba4321\", \"role\": \"Company\", \"name\": \"company\", \"headquarters\": \"hq\", \"website\": \"company.com\", \"companySize\": \"big\", \"industry\": \"indu\"}"
 // @Param register body types.RegisterUserRequest true "Register User Request"
 // @Success 201 {object} types.SuccessResponse "User registered successfully"
@@ -63,7 +63,11 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	_, err := h.UserRepo.GetUserByEmail(req.Email)
 	if err == nil {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with email %s already exists", req.Email))
+		utils.WriteError(
+			w,
+			http.StatusBadRequest,
+			fmt.Errorf("user with email %s already exists", req.Email),
+		)
 		return
 	}
 
@@ -99,18 +103,51 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid role"))
 		return
 	}
-	utils.WriteJSON(w, http.StatusCreated, types.SuccessResponse{Message: "User registered successfully"})
+	utils.WriteJSON(
+		w,
+		http.StatusCreated,
+		types.SuccessResponse{Message: "User registered successfully"},
+	)
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(map[string]string{"success": "login"})
+	var req types.LoginUserRequest
+	if err := utils.ParseJSON(r, &req); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := utils.Validate.Struct(req); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid request"))
+		return
+	}
+
+	u, err := h.UserRepo.GetUserByEmail(req.Email)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Not Found, invalid email or password"))
+		return
+	}
+
+	if !auth.ComparePassword(u.Password, []byte(req.Password)) {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Not Found, invalid email or password"))
+		return
+	}
+
+	secret := []byte(config.Envs.JWTSecret)
+	token, err := auth.CreateJWT(u.ID, secret)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
 }
 
 func parseUserFromRequest(req *types.RegisterUserRequest) *types.User {
 	return &types.User{
-		Email:     req.Email,
-		Password:  req.Password,
-		Role:      req.Role,
+		Email:    req.Email,
+		Password: req.Password,
+		Role:     req.Role,
 	}
 }
 
