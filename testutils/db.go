@@ -3,6 +3,9 @@ package testutils
 import (
 	"database/sql"
 	"testing"
+	"path/filepath"
+	"runtime"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4"
@@ -64,16 +67,25 @@ func runMigrations(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
+
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		return fmt.Errorf("could not determine current file path")
+	}
 	
+	baseDir := filepath.Dir(filename)
+
+	migrationsPath := filepath.Join(baseDir, "..", "cmd", "migrate", "migrations")
+
 	m, err := migrate.NewWithDatabaseInstance(
-		"file:///home/krimino/Documents/projects/go-projects/JobSeekerAPI/cmd/migrate/migrations",
+		"file://" + migrationsPath,
 		"mysql",
 		driver,
-	)
+		)
 	if err != nil {
 		return err
 	}
-	
+
 	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
 		return err
