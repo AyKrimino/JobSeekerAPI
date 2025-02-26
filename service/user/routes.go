@@ -134,12 +134,20 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	u, err := h.UserRepo.GetUserByEmail(req.Email)
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Not Found, invalid email or password"))
+		utils.WriteError(
+			w,
+			http.StatusBadRequest,
+			fmt.Errorf("Not Found, invalid email or password"),
+		)
 		return
 	}
 
 	if !auth.ComparePassword(u.Password, []byte(req.Password)) {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Not Found, invalid email or password"))
+		utils.WriteError(
+			w,
+			http.StatusBadRequest,
+			fmt.Errorf("Not Found, invalid email or password"),
+		)
 		return
 	}
 

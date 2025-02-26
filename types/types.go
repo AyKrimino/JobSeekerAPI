@@ -39,9 +39,7 @@ type Company struct {
 
 type UserRepository interface {
 	GetUserByEmail(e string) (*User, error)
-	GetUserByID(id int) (*User, error)
 	CreateUser(u *User) (int, error)
-	GetUserRoleByID(id int) (string, error)
 }
 
 type JobSeekerRepository interface {
@@ -84,6 +82,6 @@ type RegisterUserRequest struct {
 }
 
 type LoginUserRequest struct {
-	Email string `json:"email" validate:"required,email"`
+	Email    string `json:"email"    validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }

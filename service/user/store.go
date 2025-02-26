@@ -39,10 +39,6 @@ func (s *userStore) GetUserByEmail(e string) (*types.User, error) {
 	return u, nil
 }
 
-func (s *userStore) GetUserByID(id int) (*types.User, error) {
-	return nil, nil
-}
-
 func (s *userStore) CreateUser(u *types.User) (int, error) {
 	now := time.Now().UTC()
 
@@ -66,10 +62,6 @@ func (s *userStore) CreateUser(u *types.User) (int, error) {
 	}
 
 	return int(id), nil
-}
-
-func (s *userStore) GetUserRoleByID(id int) (string, error) {
-	return "", nil
 }
 
 func scanRowsIntoUser(rows *sql.Rows) (*types.User, error) {

@@ -22,3 +22,6 @@ migrate-down:
 migrate-force:
 	@if [ -z "$(version)" ]; then echo "Error: Please provide a version using 'make migrate-force version=<migration_version>'"; exit 1; fi
 	@migrate -path cmd/migrate/migrations -database "mysql://admin:admin@tcp(localhost:3306)/JobSeeker" force $(version)
+
+test-migrate-up:
+	@go run cmd/migrate/main.go -db-name jobSeeker_test up
