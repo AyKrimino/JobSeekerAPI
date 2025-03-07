@@ -21,7 +21,7 @@ func NewJobseekerStore(db *sql.DB) types.JobSeekerRepository {
 func (s *jobseekerStore) CreateJobSeeker(js *types.JobSeeker) error {
 	skillsJSON, err := utils.EncodeStringSliceToJSON(js.Skills)
 	if err != nil {
-		return fmt.Errorf("Error encoding skills to JSON: %v", err)
+		return fmt.Errorf("error encoding skills to JSON: %v", err)
 	}
 
 	_, err = s.db.Exec(
