@@ -5,11 +5,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/AyKrimino/JobSeekerAPI/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 func CreateJWT(userID int, secret []byte) (string, error) {
+	if len(secret) == 0 {
+		return "", fmt.Errorf("secret key cannot be empty")
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"userID": strconv.Itoa(userID),
@@ -25,15 +28,14 @@ func CreateJWT(userID int, secret []byte) (string, error) {
 	return tokenString, nil
 }
 
-func validateJWT(tokenString string) (*jwt.Token, jwt.MapClaims, error) {
+func ValidateJWT(tokenString string, secret []byte) (*jwt.Token, jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
 
-		return []byte(config.Envs.JWTSecret), nil
+		return secret, nil
 	})
-
 	if err != nil {
 		return nil, nil, err
 	}
