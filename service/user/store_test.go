@@ -74,9 +74,9 @@ func TestCreateUser_InvalidRole(t *testing.T) {
 	userStore := NewUserStore(db)
 
 	u := &types.User{
-		Email: "invalidRole@test.com",
+		Email:    "invalidRole@test.com",
 		Password: "pass1234",
-		Role: "InvalidRole",
+		Role:     "InvalidRole",
 	}
 
 	userID, err := userStore.CreateUser(u)
@@ -111,7 +111,7 @@ func TestCreateUser_LongEmail(t *testing.T) {
 	}
 }
 
-func TestGetUserByEmail_NotFound(t * testing.T) {
+func TestGetUserByEmail_NotFound(t *testing.T) {
 	db := testutils.SetupTestDB(t)
 	defer db.Close()
 
