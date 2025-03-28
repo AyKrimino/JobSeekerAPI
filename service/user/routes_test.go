@@ -32,15 +32,15 @@ func TestHandleRegister(t *testing.T) {
 		defer db.Close()
 
 		reqBody := `{
-			"email": "` + testEmail + `",
-			"password": "password123",
-			"role": "JobSeeker",
-			"firstName": "John",
-			"lastName": "Doe",
-			"profileSummary": "Software Engineer",
-			"skills": ["Go", "Python"],
-			"experience": 2,
-			"education": "BSc Computer Science"
+		"email": "` + testEmail + `",
+		"password": "password123",
+		"role": "JobSeeker",
+		"firstName": "John",
+		"lastName": "Doe",
+		"profileSummary": "Software Engineer",
+		"skills": ["Go", "Python"],
+		"experience": 2,
+		"education": "BSc Computer Science"
 		}`
 
 		req := httptest.NewRequest("POST", "/register", strings.NewReader(reqBody))
@@ -67,6 +67,172 @@ func TestHandleRegister(t *testing.T) {
 
 		if createdUser.Role != "JobSeeker" {
 			t.Fatalf("expected user role to be `JobSeeker`, got `%s`", createdUser.Role)
+		}
+	})
+
+	t.Run("Valid Company Registration", func(t *testing.T) {
+		handler, db := SetupHandlerWithDB(t)
+		defer db.Close()
+
+		reqBody := `{
+		"email": "` + testEmail + `",
+		"password": "password123",
+		"role": "Company",
+		"name": "TechNova",
+		"headquarters": "San Francisco, CA, USA",
+		"website": "www.technova.com",
+		"industry": "Information Technology",
+		"companySize": "201-500"
+		}`
+
+		req := httptest.NewRequest("POST", "/register", strings.NewReader(reqBody))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+
+		handler.handleRegister(rec, req)
+
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if res.StatusCode != http.StatusCreated {
+			t.Fatalf("expected status code 201, got %d", res.StatusCode)
+		}
+
+		createdUser, err := handler.UserRepo.GetUserByEmail(testEmail)
+		if err != nil {
+			t.Fatalf("failed to fetch user from DB: %v", err)
+		}
+
+		if createdUser.Email != testEmail {
+			t.Fatalf("expected user email to be `%s`, got `%s`", testEmail, createdUser.Email)
+		}
+
+		if createdUser.Role != "Company" {
+			t.Fatalf("expected user role to be `Company`, got `%s`", createdUser.Role)
+		}
+	})
+
+	t.Run("Invalid request body missing required role field", func(t *testing.T) {
+		handler, db := SetupHandlerWithDB(t)
+		defer db.Close()
+
+		reqBody := `{
+		"email": "` + testEmail + `",
+		"password": "password123",
+		"name": "TechNova",
+		"headquarters": "San Francisco, CA, USA",
+		"website": "www.technova.com",
+		"industry": "Information Technology",
+		"companySize": "201-500"
+		}`
+
+		req := httptest.NewRequest("POST", "/register", strings.NewReader(reqBody))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+
+		handler.handleRegister(rec, req)
+
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if res.StatusCode != http.StatusBadRequest {
+			t.Fatalf("expected status code 400, got %d", res.StatusCode)
+		}
+
+		_, err := handler.UserRepo.GetUserByEmail(testEmail)
+		if err == nil {
+			t.Fatal("expected user fetching to fail.")
+		}
+	})
+
+	t.Run("User already exist", func(t *testing.T) {
+		handler, db := SetupHandlerWithDB(t)
+		defer db.Close()
+
+		reqBody := `{
+		"email": "` + testEmail + `",
+		"password": "password123",
+		"role": "JobSeeker",
+		"firstName": "John",
+		"lastName": "Doe",
+		"profileSummary": "Software Engineer",
+		"skills": ["Go", "Python"],
+		"experience": 2,
+		"education": "BSc Computer Science"
+		}`
+
+		req := httptest.NewRequest("POST", "/register", strings.NewReader(reqBody))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+
+		handler.handleRegister(rec, req)
+
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if res.StatusCode != http.StatusCreated {
+			t.Fatalf("expected status code 201, got %d", res.StatusCode)
+		}
+
+		createdUser, err := handler.UserRepo.GetUserByEmail(testEmail)
+		if err != nil {
+			t.Fatalf("failed to fetch user from DB: %v", err)
+		}
+
+		if createdUser.Email != testEmail {
+			t.Fatalf("expected user email to be `%s`, got `%s`", testEmail, createdUser.Email)
+		}
+
+		if createdUser.Role != "JobSeeker" {
+			t.Fatalf("expected user role to be `JobSeeker`, got `%s`", createdUser.Role)
+		}
+
+		req2 := httptest.NewRequest("POST", "/register", strings.NewReader(reqBody))
+		req2.Header.Set("Content-Type", "application/json")
+		rec2 := httptest.NewRecorder()
+
+		handler.handleRegister(rec2, req2)
+
+		res2 := rec2.Result()
+		defer res2.Body.Close()
+
+		if res2.StatusCode != http.StatusBadRequest {
+			t.Fatalf("expected status code 400, got %d", res2.StatusCode)
+		}
+	})
+
+	t.Run("Invalid role", func(t *testing.T) {
+		handler, db := SetupHandlerWithDB(t)
+		defer db.Close()
+
+		reqBody := `{
+		"email": "` + testEmail + `",
+		"password": "password123",
+		"role": "invalid role",
+		"firstName": "John",
+		"lastName": "Doe",
+		"profileSummary": "Software Engineer",
+		"skills": ["Go", "Python"],
+		"experience": 2,
+		"education": "BSc Computer Science"
+		}`
+
+		req := httptest.NewRequest("POST", "/register", strings.NewReader(reqBody))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+
+		handler.handleRegister(rec, req)
+
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if res.StatusCode != http.StatusBadRequest {
+			t.Fatalf("expected status code 400, got %d", res.StatusCode)
+		}
+
+		_, err := handler.UserRepo.GetUserByEmail(testEmail)
+		if err == nil {
+			t.Fatal("expected user fetching to fail.")
 		}
 	})
 }
