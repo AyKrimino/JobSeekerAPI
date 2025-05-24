@@ -74,9 +74,10 @@ func TestComparePassword(t *testing.T) {
 func TestCreateJWT(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		userID := 1
+		userRole := "JobSeeker"
 		secret := []byte("secret")
 
-		token, err := auth.CreateJWT(userID, secret)
+		token, err := auth.CreateJWT(userID, userRole, secret)
 		if err != nil {
 			t.Fatalf("expected no error, got %v", err)
 		}
@@ -88,9 +89,25 @@ func TestCreateJWT(t *testing.T) {
 
 	t.Run("Empty Secret", func(t *testing.T) {
 		userID := 1
+		userRole := "Company"
 		secret := []byte("")
 
-		token, err := auth.CreateJWT(userID, secret)
+		token, err := auth.CreateJWT(userID, userRole, secret)
+		if err == nil {
+			t.Fatal("expected an error")
+		}
+
+		if token != "" {
+			t.Error("expected an empty token string")
+		}
+	})
+
+	t.Run("Invalid user role", func(t *testing.T) {
+		userID := 1
+		userRole := "invalid role"
+		secret := []byte("secret")
+
+		token, err := auth.CreateJWT(userID, userRole, secret)
 		if err == nil {
 			t.Fatal("expected an error")
 		}
@@ -104,9 +121,10 @@ func TestCreateJWT(t *testing.T) {
 func TestValidateJWT(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		userID := 1
+		userRole := "JobSeeker"
 		secret := []byte("secret")
 
-		tokenString, err := auth.CreateJWT(userID, secret)
+		tokenString, err := auth.CreateJWT(userID, userRole, secret)
 		if err != nil {
 			t.Fatalf("expected no error, got %v", err)
 		}

@@ -3,19 +3,25 @@ package auth
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func CreateJWT(userID int, secret []byte) (string, error) {
+func CreateJWT(userID int, userRole string, secret []byte) (string, error) {
 	if len(secret) == 0 {
 		return "", fmt.Errorf("secret key cannot be empty")
+	}
+
+	if !strings.EqualFold(userRole, "JobSeeker") && !strings.EqualFold(userRole, "Company") {
+		return "", fmt.Errorf("invalid user role")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"userID": strconv.Itoa(userID),
+			"role":   userRole,
 			"exp":    time.Now().Add(time.Hour * 24).Unix(),
 		},
 	)
